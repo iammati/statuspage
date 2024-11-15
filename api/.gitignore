@@ -1,3 +1,2 @@
-logs
-*.log
+!src/db/
 src/pkg/
