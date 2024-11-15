@@ -1,0 +1,6 @@
+*.log
+
+api/dist/
+api/src/pkg/
+db/
+logs/

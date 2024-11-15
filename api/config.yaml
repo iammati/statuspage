@@ -1,0 +1,7 @@
+domains:
+  - domain: "schommer-media.de"
+    subdomains:
+      - "gitlab"
+      - "ze"
+    tags:
+      - "intern"
