@@ -1,6 +1,7 @@
 services:
   api:
     container_name: statuspage-api
+    env_file: ".env"
     build:
       context: .
       dockerfile: ./api/Dockerfile
@@ -10,6 +11,7 @@ services:
     ports:
       - 8080:8080
     volumes:
+      - $KUBECONFIG:$KUBECONFIG
       - ./api/src/:/app
     networks:
       - app-network

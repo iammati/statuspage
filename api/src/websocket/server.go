@@ -1,9 +1,13 @@
 package websocket
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"sync"
+
+	"iammati/statuspage/handlers/k8s"
+	"iammati/statuspage/utils"
 
 	"github.com/gorilla/websocket"
 )
@@ -15,7 +19,8 @@ var upgrader = websocket.Upgrader{
 }
 
 type Message struct {
-	Message string `json:"message"`
+	API       string `json:"api"`
+	Namespace string `json:"namespace,omitempty"`
 }
 
 var clients = make(map[*websocket.Conn]bool) // Connected clients
@@ -37,55 +42,47 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	// Continuous message handling loop
 	for {
 		// Read message from client
-		messageType, message, err := ws.ReadMessage()
+		_, message, err := ws.ReadMessage()
 		if err != nil {
 			log.Printf("Error reading message: %v", err)
 			break // Exit the loop if there's an error (e.g., client disconnected)
 		}
 
-		log.Printf("Received message: %s", message)
+		// Parse the JSON message
+		var msg Message
+		err = json.Unmarshal(message, &msg)
+		if err != nil {
+			log.Printf("Error parsing JSON: %v", err)
+			utils.SendMessage(ws, `{"error": "Invalid JSON format"}`)
+			continue // Skip further processing for this message
+		}
 
-		// Handle "ping" message by responding with "pong"
-		if string(message) == "ping" {
-			err = ws.WriteMessage(messageType, []byte("pong"))
-			log.Println("Sent pong")
+		switch msg.API {
+		case "k8s/namespaces/list":
+			response := k8s.ListNamespaces()
+			err := utils.SendMessage(ws, response)
 			if err != nil {
-				log.Printf("Error sending pong message: %v", err)
-				break // Exit the loop if unable to send a message
+				log.Printf("Error sending response: %v", err)
 			}
+		case "k8s/pods/list":
+			if msg.Namespace == "" {
+				log.Println("Missing 'namespace' in message payload")
+				utils.SendMessage(ws, `{"error": "Missing 'namespace' in message payload"}`)
+				continue // Skip further processing for this message
+			}
+
+			response := k8s.ListPods(msg.Namespace)
+			err := utils.SendMessage(ws, response)
+			if err != nil {
+				log.Printf("Error sending response: %v", err)
+			}
+		default:
+			log.Printf("Unknown API command: %s", msg.API)
+			utils.SendMessage(ws, `{"error": "Unknown API command"}`)
 		}
 	}
 
 	log.Println("WebSocket client disconnected")
-}
-
-func readMessages(ws *websocket.Conn) {
-	for {
-		// Read message from client
-		messageType, message, err := ws.ReadMessage()
-		if err != nil {
-			log.Printf("Error reading message: %v", err)
-			mutex.Lock()
-			delete(clients, ws)
-			mutex.Unlock()
-			break
-		}
-
-		log.Printf("Received message: %s", message)
-
-		// If "ping" received, reply with "pong"
-		if string(message) == "ping" {
-			err = ws.WriteMessage(messageType, []byte("pong"))
-			log.Println("Sent pong")
-			if err != nil {
-				log.Printf("Error sending pong message: %v", err)
-				break
-			}
-		}
-
-		// Broadcast the received message to all connected clients
-		broadcast <- Message{Message: string(message)}
-	}
 }
 
 func BroadcastMessages() {

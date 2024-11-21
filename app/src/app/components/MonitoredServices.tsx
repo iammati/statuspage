@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { TrendingUp } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 import { Area, AreaChart, XAxis } from 'recharts';
 
 import {
@@ -18,16 +18,31 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from '@/components/ui/chart';
-import { ws } from '../layout';
+import { useWebSocket } from '../hooks/useWebSocket';
+import Api from '../services/webSocketApi';
 
 function MonitoredServices() {
-    console.log(ws);
-    const chartData = [
+    // Api('k8s/namespaces/list', (api: string, json: any) => {
+    //     const { namespaces } = json;
+    //     console.log(api, JSON.parse(namespaces));
+    // });
+
+    Api('k8s/pods/list',
+        (api: string, json: any) => {
+            const { pods } = json;
+            console.log(JSON.parse(pods));
+        },
+        {
+            'namespace': 'sh-jenniferwalker',
+        },
+    );
+
+    const [chartData, setChartData] = useState([
         { label: '10:00', dnsResolutionTime: 55, httpTime: 40, tcpConnectionTime: 22 },
         { label: '10:05', dnsResolutionTime: 74, httpTime: 50, tcpConnectionTime: 14 },
         { label: '10:10', dnsResolutionTime: 58, httpTime: 30, tcpConnectionTime: 18 },
         { label: '10:15', dnsResolutionTime: 51, httpTime: 35, tcpConnectionTime: 16 },
-    ];
+    ]);
 
     const chartConfig = {
         tcpConnectionTime: {
@@ -40,7 +55,7 @@ function MonitoredServices() {
         },
         dnsResolutionTime: {
             label: 'DNS Resolution Time (ms)',
-            color: "#2563eb",
+            color: '#2563eb',
         },
     } satisfies ChartConfig;
 
@@ -92,14 +107,14 @@ function MonitoredServices() {
                 </CardContent>
                 <CardFooter>
                     <div className="flex w-full items-start gap-2 text-sm">
-                    <div className="grid gap-2">
-                        <div className="flex items-center gap-2 font-medium leading-none">
-                            Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+                        <div className="grid gap-2">
+                            <div className="flex items-center gap-2 font-medium leading-none">
+                                Trending up by 5.2% this month <TrendingDown className="h-4 w-4" />
+                            </div>
+                            <div className="flex items-center gap-2 leading-none text-muted-foreground">
+                                {chartData[0].label} - {chartData[chartData.length - 1].label}
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2 leading-none text-muted-foreground">
-                            {chartData[0].label} - {chartData[chartData.length - 1].label}
-                        </div>
-                    </div>
                     </div>
                 </CardFooter>
             </Card>

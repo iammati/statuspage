@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"infraops.dev/statuspage-core/config"
-	db_migrations "infraops.dev/statuspage-core/db/migrations"
-	"infraops.dev/statuspage-core/utils"
+	"iammati/statuspage/config"
+	db_migrations "iammati/statuspage/db/migrations"
+	"iammati/statuspage/utils"
 )
 
 type ServiceState struct {

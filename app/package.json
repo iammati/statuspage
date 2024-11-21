@@ -1,5 +1,5 @@
 {
-    "name": "@infraops.dev/statuspage-app",
+    "name": "@iammati/statuspage-app",
     "version": "0.1.0",
     "private": true,
     "scripts": {

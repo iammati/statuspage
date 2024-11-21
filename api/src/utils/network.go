@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"infraops.dev/statuspage-core/config"
+	"iammati/statuspage/config"
 )
 
 type Metrics struct {

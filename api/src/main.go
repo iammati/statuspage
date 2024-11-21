@@ -10,9 +10,9 @@ import (
 	"syscall"
 	"time"
 
-	"infraops.dev/statuspage-core/config"
-	"infraops.dev/statuspage-core/handlers"
-	"infraops.dev/statuspage-core/websocket"
+	"iammati/statuspage/config"
+	"iammati/statuspage/handlers"
+	"iammati/statuspage/websocket"
 )
 
 func main() {
@@ -46,7 +46,7 @@ func main() {
 		PrintLog("", false)
 	}
 
-	PrintLog("======================================= STATUSPAGE-CORE =======================================", false)
+	PrintLog("======================================= STATUSPAGE =======================================", false)
 	PrintLog("", false)
 
 	srv.Handler = corsHandler
@@ -90,7 +90,7 @@ func PrintLog(reason string, doNotLogIt bool) {
 func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Set CORS headers
-		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+		w.Header().Set("Access-Control-Allow-Origin", "http://app:3000")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")

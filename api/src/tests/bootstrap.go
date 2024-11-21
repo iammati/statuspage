@@ -9,8 +9,8 @@ import (
 	"log"
 	"net/http"
 
-	"infraops.dev/statuspage-core/config"
-	"infraops.dev/statuspage-core/utils"
+	"iammati/statuspage/config"
+	"iammati/statuspage/utils"
 )
 
 func CertPool() *x509.CertPool {

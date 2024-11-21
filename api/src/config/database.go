@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/jackc/pgx"
-	db "infraops.dev/statuspage-core/db"
+	db "iammati/statuspage/db"
 )
 
 func Database() *pgx.Conn {

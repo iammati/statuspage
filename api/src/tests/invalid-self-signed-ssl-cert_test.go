@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"infraops.dev/statuspage-core/utils"
+	"iammati/statuspage/utils"
 )
 
 func TestOnInvalidSelfSignedCert(t *testing.T) {
